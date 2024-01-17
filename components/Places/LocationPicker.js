@@ -1,11 +1,22 @@
-import { StyleSheet, View, Alert } from 'react-native'
+import { StyleSheet, View, Alert, Text, Image } from 'react-native'
 import { getCurrentPositionAsync, useForegroundPermissions, PermissionStatus } from 'expo-location'
 
 import OutlinedButton from '../UI/OutlinedButton'
 import { Colors } from '../../constants/colors'
+import { useNavigation } from '@react-navigation/native'
+import { useEffect, useState } from 'react'
+import { getMapPreview } from '../../util/location'
 
-function LocationPicker() {
+function LocationPicker({ lat, lng }) {
   const [locationPermissionInformation, requestPermission] = useForegroundPermissions()
+  const [pickedLocation, setPickedLocation] = useState()
+  const navigation = useNavigation()
+
+  useEffect(() => {
+    if (lat && lng) {
+      setPickedLocation({ lat, lng })
+    }
+  }, [lat, lng, setPickedLocation])
 
   async function verifyPermissions() {
     if (locationPermissionInformation.status === PermissionStatus.UNDETERMINED) {
@@ -29,14 +40,27 @@ function LocationPicker() {
     }
 
     const location = await getCurrentPositionAsync()
-    console.log(location)
+    setPickedLocation({
+      lat: location.coords.latitude,
+      lng: location.coords.longitude,
+    })
   }
 
-  function pickOnMapHandler() {}
+  function pickOnMapHandler() {
+    navigation.navigate('Map')
+  }
+
+  let locationPreview = <Text>No location picked yet.</Text>
+
+  if (pickedLocation) {
+    locationPreview = (
+      <Image style={styles.image} source={{ uri: getMapPreview(pickedLocation.lat, pickedLocation.lng) }} />
+    )
+  }
 
   return (
     <View>
-      <View style={styles.mapPreview}></View>
+      <View style={styles.mapPreview}>{locationPreview}</View>
 
       <View style={styles.actions}>
         <OutlinedButton icon="location" onPress={getLocationHandler}>
@@ -59,11 +83,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.primary500,
     borderRadius: 4,
+    overflow: 'hidden',
   },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
 })
 

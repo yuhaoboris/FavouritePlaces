@@ -5,7 +5,7 @@ import { Colors } from '../../constants/colors'
 import ImagePicker from './ImagePicker'
 import LocationPicker from './LocationPicker'
 
-function PlaceForm() {
+function PlaceForm({ location }) {
   const [enteredTitle, setEnteredTitle] = useState('')
 
   function changeTitleHandler(enteredText) {
@@ -21,7 +21,7 @@ function PlaceForm() {
 
       <ImagePicker />
 
-      <LocationPicker />
+      <LocationPicker lat={location?.lat} lng={location?.lng} />
     </ScrollView>
   )
 }
