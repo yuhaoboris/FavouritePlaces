@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import PlaceForm from '../components/Places/PlaceForm'
+import { insertPlace } from '../util/database'
 
 function AddPlace({ navigation, route }) {
   const [pickedLocation, setPickedLocation] = useState(null)
@@ -13,10 +14,10 @@ function AddPlace({ navigation, route }) {
     }
   }, [route, setPickedLocation])
 
-  function createPlaceHandler(place) {
-    navigation.navigate('AllPlaces', {
-      place,
-    })
+  async function createPlaceHandler(place) {
+    await insertPlace(place)
+
+    navigation.navigate('AllPlaces')
   }
 
   return <PlaceForm location={pickedLocation} onCreatePlace={createPlaceHandler} />
