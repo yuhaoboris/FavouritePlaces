@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import PlaceForm from '../components/Places/PlaceForm'
 
-function AddPlace({ route }) {
+function AddPlace({ navigation, route }) {
   const [pickedLocation, setPickedLocation] = useState(null)
 
   useEffect(() => {
@@ -13,7 +13,13 @@ function AddPlace({ route }) {
     }
   }, [route, setPickedLocation])
 
-  return <PlaceForm location={pickedLocation} />
+  function createPlaceHandler(place) {
+    navigation.navigate('AllPlaces', {
+      place,
+    })
+  }
+
+  return <PlaceForm location={pickedLocation} onCreatePlace={createPlaceHandler} />
 }
 
 export default AddPlace

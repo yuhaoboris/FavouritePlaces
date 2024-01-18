@@ -5,9 +5,9 @@ import OutlinedButton from '../UI/OutlinedButton'
 import { Colors } from '../../constants/colors'
 import { useNavigation } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
-import { getMapPreview } from '../../util/location'
+import { getAddress, getMapPreview } from '../../util/location'
 
-function LocationPicker({ lat, lng }) {
+function LocationPicker({ lat, lng, onPickLocation }) {
   const [locationPermissionInformation, requestPermission] = useForegroundPermissions()
   const [pickedLocation, setPickedLocation] = useState()
   const navigation = useNavigation()
@@ -16,7 +16,18 @@ function LocationPicker({ lat, lng }) {
     if (lat && lng) {
       setPickedLocation({ lat, lng })
     }
-  }, [lat, lng, setPickedLocation])
+  }, [lat, lng])
+
+  useEffect(() => {
+    async function fetchAddress() {
+      if (pickedLocation) {
+        const address = await getAddress(pickedLocation.lat, pickedLocation.lng)
+        onPickLocation({ ...pickedLocation, address })
+      }
+    }
+
+    fetchAddress()
+  }, [pickedLocation, onPickLocation])
 
   async function verifyPermissions() {
     if (locationPermissionInformation.status === PermissionStatus.UNDETERMINED) {
@@ -61,6 +72,7 @@ function LocationPicker({ lat, lng }) {
   return (
     <View>
       <View style={styles.mapPreview}>{locationPreview}</View>
+      {/* <Text style={styles.address}>{pickedLocation.address}</Text> */}
 
       <View style={styles.actions}>
         <OutlinedButton icon="location" onPress={getLocationHandler}>
